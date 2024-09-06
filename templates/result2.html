@@ -17,16 +17,13 @@ Created on Mon Aug 19 08:18:19 2024
    <div id="logo-container"></div>
    <div class="centered-box">
         <h1>Résultat de la Simulation</h1>
-        {% if abordable_duree %}
-            {% if abordable %}
-            <p>Votre paiement mensuel est de : {{ monthly_payment }} FCFA</p>
-            <p>Votre pret est abordable !</p>
-            {% else %}   
-            <p>Il est impossible que vous ayez ce pret avec votre salaire actuel. Essayer de reduire le montant du pret !</p>
-            {% endif %}
+        {% if abordable1 %}
+            <p>Votre payement mensuel sera de : {{ monthly_payment }} FCFA</p>
+            <p>Sur une duree de {{ months }} mois</p>
         {% else %}
-            <p> Vous ne pouvez pas atteindre cette duree de pret essayer de reduire la duree en mois ! </p>
-        {% endif %}        
+        
+            <p> Simulation impossible Essayer de changer votre montant du pret!</p>
+        {% endif %}    
         <a href="{{ url_for('type1') }}">Faire une nouvelle simulation</a>
    </div> 
 </body>

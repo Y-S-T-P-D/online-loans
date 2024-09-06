@@ -34,7 +34,7 @@ from waitress import serve
 
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
-
+import math
 
 # Se positionner dans le meme dosssier que le projet
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -122,6 +122,10 @@ def login():
                 return render_template('login.html')
 
 
+@app.route('/type1')
+def type1():
+    return render_template('type.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
      
@@ -187,6 +191,62 @@ def simulate_credit(principal, salary, annual_rate, months):
     
     return monthly_payment, affordable
    
+def simulate_montant(salary,annual_rate,months):  
+     
+     # Calcul du montant maximal mensuel que le client peut rembourser
+     monthly_payment=salary*(45/100)
+     
+     # Conversion du taux d'intérêt annuel en taux mensuel
+     monthly_rate=annual_rate/12
+    
+     
+     # Calcul du montant maximal mensuel que le client peut rembourser
+     montant_max=monthly_payment/ (monthly_rate / (1 -( 1+ monthly_rate) ** (-months)))
+     
+                                   
+
+     return monthly_payment,montant_max
+ 
+    
+
+def simulate_duree(salary, annual_rate, montant):         #monthly_payment, months =simulate_duree(salary, annual_rate, montant)
+
+    monthly_rate = annual_rate / 12 
+    monthly_payment_max = salary * 0.45
+    monthly_payment = montant * monthly_rate / (1 - (1 + monthly_rate) ** (-12))
+    
+    if monthly_payment >monthly_payment_max :
+        monthly_payment=monthly_payment_max
+        
+      
+        
+    months = math.log(1 - (montant * monthly_rate / monthly_payment)) / math.log(1 + monthly_rate)
+    months=-months
+    return monthly_payment, months
+
+
+    def calculer_duree_et_mensualite(salaire, taux_annuel, montant):
+    # Taux mensuel
+     taux_mensuel = taux_annuel / 12 / 100
+    
+    # Paiement mensuel maximum basé sur 45% du salaire
+     paiement_mensuel_max = salaire * 0.45
+    
+    # Formule pour calculer la mensualité
+     mensualite = montant * taux_mensuel / (1 - (1 + taux_mensuel) ** -360)
+    
+    # Ajuster la mensualité si elle dépasse le paiement mensuel maximum
+     if mensualite > paiement_mensuel_max:
+            mensualite = paiement_mensuel_max
+        
+    # Formule pour calculer le nombre de mois
+     nombre_de_mois = math.log(1 - (montant * taux_mensuel / mensualite)) / math.log(1 + taux_mensuel)
+    
+    # Convertir en nombre de mois positif
+     nombre_de_mois = -nombre_de_mois
+    
+     return math.ceil(nombre_de_mois), mensualite
+    
 @app.route('/count_user')
 def compte():
     
@@ -208,39 +268,96 @@ def simulate():
      global i
      i+=1
      # recuperer les differentes valeurs du formulaire
-     montant = float(request.form['montant'])
+     salary=float(request.form['salary'])   
      index= int(request.form['index'])
-     months = int(request.form['months'])
-     salary=float(request.form['salary'])     
-              
-     # selectionner dans la table l'enregistrement qui correspond a l'id index
-     selected_item = db.session.query(enteprise2).filter_by(index=index).first() 
-     if selected_item:
-         
-         # a la variable DUREE_MAX on affecte la duree maximale pouvant etre atteint par le client en fonction de son entreprise
-         DUREE_MAX=selected_item.DUREE_MAX
-         if type==1 :
-           annual_rate = selected_item.Taux_Cresco  # Récupérer la valeur de la colonne souhaitée
-         else :
-           annual_rate=selected_item.Taux_Amort  
-       
-    
-    
-    # verifier si la duree qu'il a entrez ne depasse pas la valeur maximale
-     abordable1=(DUREE_MAX >= months)
-    
-    
-    
-     monthly_payment,abordable= simulate_credit(montant,salary,annual_rate,months)
      
-    
-     return render_template('result.html', monthly_payment=monthly_payment,abordable=abordable,abordable_duree=abordable1)
+     if(request.form.get('months') and request.form.get('montant')) :  
+        months = float(request.form['months'])
+        montant=float(request.form['montant'])
+        # selectionner dans la table l'enregistrement qui correspond a l'id index
+        selected_item = db.session.query(enteprise2).filter_by(index=index).first() 
+        if selected_item:
+            
+            # a la variable DUREE_MAX on affecte la duree maximale pouvant etre atteint par le client en fonction de son entreprise
+            DUREE_MAX=selected_item.DUREE_MAX
+            if type==1 :
+              annual_rate = selected_item.Taux_Cresco  # Récupérer la valeur de la colonne souhaitée
+            else :
+              annual_rate=selected_item.Taux_Amort  
+              
+          
+       # verifier si la duree qu'il a entrez ne depasse pas la valeur maximale
+        abordable1=(DUREE_MAX >= months)
+       
+        monthly_payment,abordable= simulate_credit(montant,salary,annual_rate,months)
+        
+        return render_template('result.html', monthly_payment=monthly_payment,abordable=abordable,abordable_duree=abordable1)
+     elif request.form.get('months') and (not request.form.get('montant')) : 
+             months=float(request.form['months'])
+             selected_item = db.session.query(enteprise2).filter_by(index=index).first()
+             if selected_item:
+                 DUREE_MAX=selected_item.DUREE_MAX
+                 if type==1 :
+                   annual_rate = selected_item.Taux_Cresco  # Récupérer la valeur de la colonne souhaitée
+                 else :
+                   annual_rate=selected_item.Taux_Amort  
+             monthly_payment,montant_max=simulate_montant(salary,annual_rate,months)
+             
+             if DUREE_MAX>=months :
+                 abordable_duree=True
+                 return render_template('result.html',monthly_payment=monthly_payment,abordable_duree=abordable_duree)
+             else :
+                 return render_template('result.html',abordable_duree=abordable_duree)
+ 
+                
+         
+     elif (not request.form.get('months') ) and (request.form.get('montant')):
+              
+                # selectionner dans la table l'enregistrement qui correspond a l'id index
+                montant=float(request.form['montant'])
+                selected_item = db.session.query(enteprise2).filter_by(index=index).first() 
+                if selected_item:
+                    
+                    # a la variable DUREE_MAX on affecte la duree maximale pouvant etre atteint par le client en fonction de son entreprise
+                    DUREE_MAX=selected_item.DUREE_MAX
+                    if type==1 :
+                      annual_rate = selected_item.Taux_Cresco  # Récupérer la valeur de la colonne souhaitée
+                    else :
+                      annual_rate=selected_item.Taux_Amort  
+                      
+                monthly_payment, months =simulate_duree(salary, annual_rate, montant)
+                
+                abordable1=(DUREE_MAX>=months)
+                
+               
+                return render_template('result2.html',monthly_payment=int(monthly_payment),months=int(months),abordable1=int(abordable1))
+                
+                
+     else :
+                 selected_item = db.session.query(enteprise2).filter_by(index=index).first()
+                 if selected_item:
+                     months1=selected_item.DUREE_MAX
+                     if type==1 :
+                       annual_rate = selected_item.Taux_Cresco  # Récupérer la valeur de la colonne souhaitée
+                     else :
+                       annual_rate=selected_item.Taux_Amort  
+                 
+                     monthly_payment,montant_max=simulate_montant(salary,annual_rate,months1)
+                     months1=int(montant_max//monthly_payment)
+                 
+                 return render_template('result1.html',monthly_payment=int(monthly_payment),montant_max=int(montant_max),months1=int(months1))
+         
+       
+       
+       
+              
+     
 
 
 
 
 
 if __name__ == '__main__':
-    #app.run(debug=True)
-    serve(app, host="0.0.0.0",port=5000)
+    app.run(debug=True)
+    ##serve(app, host="0.0.0.0",port=5000)
     

@@ -13,6 +13,40 @@ Created on Mon Aug 19 08:15:56 2024
     <link rel="stylesheet" type="text/css" href="../static/css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../static/js/scripts.js"></script>
+     <script>
+   
+
+     /* function formaterSommeArgent() {
+         var montant = document.getElementById('montant').value;
+         var montantFormate = parseFloat(montant).toLocaleString('fr-FR', {
+             style: 'currency',
+             currency: 'EUR'
+         });
+         document.getElementById('montantFormate').innerText = montantFormate;
+     }
+     
+    // Ajoutez un écouteur d'événements pour le champ de saisie
+     document.getElementById('montant').addEventListener('input', formaterSommeArgent);*/
+     
+     function formatInput(value) {
+   // Supprime les caractères non numériques sauf la virgule
+   value = value.replace(/[^0-9,]/g, '');
+   
+   // Remplace la virgule par un point pour le formatage
+   value = value.replace(/,/g, '.');
+   
+   // Formatte le nombre avec des espaces tous les trois chiffres
+   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+ }
+
+ // Ajoute un écouteur d'événements sur le champ de saisie
+ document.getElementById('montant').addEventListener('input', function(e) {
+   // Applique la fonction de formatage à la valeur saisie
+   e.target.value = formatInput(e.target.value);
+ });
+
+
+     </script>
 </head>
 <body>
   <div id="logo-container"></div>
@@ -21,7 +55,7 @@ Created on Mon Aug 19 08:15:56 2024
     <form action="/simulate" method="post">
     
         <label for="montant">Montant du prêt(En FCFA) :</label>
-        <input type="text" id="montant" name="montant" placeholder="Entrez le montant en FCFA" required><br><br>
+        <input type="text" id="montant" name="montant" placeholder="Entrez le montant en FCFA" ><br><br>
         
         
         
@@ -36,10 +70,11 @@ Created on Mon Aug 19 08:15:56 2024
         <input type="text" id="salary" name="salary"  placeholder="Entrez votre salaire(En FCFA)" required><br><br>
         
         <label for="months">Durée du prêt (en mois) :</label>
-        <input type="text" id="months" name="months"  placeholder="Entrez la duree du pret en annee" required><br><br>
+        <input type="text" id="months" name="months"  placeholder="Entrez la duree du pret en annee" ><br><br>
         
         <input type="submit" value="Calculer">
    </div>     
     </form>
+   
 </body>
 </html>
