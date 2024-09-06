@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../static/js/scripts.js"></script>
+</head>
+<body>
+<script alnguage="javascript">
+
+function verifForm(formulaire){
+
+
+    mdp1=formulaire.mdp1.value;
+    mdp=formulaire.mdp.value;
+    
+    if(mdp != mdp1){
+    
+       alert("Entrez des mots de passe identiques !");
+       return (false);
+    }else{
+    
+    
+        return(true);
+    }
+
+
+}
+
+
+</script>
+    <div id="logo-container"></div>
+    <div class="login-container">
+        <h2>Register</h2>
+        {% if error=="erreur" %}
+        <script language="javascript">
+          alert("veillez entrez des mots de passes identiques")
+        </script>
+        {% endif %}
+        <form action="{{ url_for('register') }}" onSubmit="return(verifForm(this))" method="POST">          
+            <div class="input-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" placeholder="facultatif">
+            </div>
+            <div class="input-group">
+                <label for="telephone">Numero de Telephone</label>
+                <input type="text" id="telephone" name="telephone"  placeholder="obligatoire" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Adresse email</label>
+                <input type="email" id="email" name="email"  placeholder="obligatoire" required>
+            </div>
+            <a href= "{{ url_for('register') }}"> j'ai deja un compte </a>
+            <input type="submit"  value="S'inscrire">
+        </form>
+    </div>
+
+</body>
+</html>

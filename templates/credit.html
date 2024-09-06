@@ -1,0 +1,45 @@
+<!--# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 19 08:15:56 2024
+
+@author: OMD
+"""
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulateur de Crédit</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../static/js/scripts.js"></script>
+</head>
+<body>
+  <div id="logo-container"></div>
+  <div class="centered-box">
+    <center><h1>Simulateur de Crédit</h1></center>
+    <form action="/simulate" method="post">
+    
+        <label for="montant">Montant du prêt(En FCFA) :</label>
+        <input type="text" id="montant" name="montant" placeholder="Entrez le montant en FCFA" required><br><br>
+        
+        
+        
+        <label for="annual_rate">Selectionner votre entreprise de travail:</label>
+         <select id="item" name="index">
+            {% for item in items %}
+                <option value="{{ item.index }}">{{ item.NOMS_DES_ENTREPRISES }}</option>
+            {% endfor %}
+        </select><br><br>
+        
+        <label for="salary">Entrer votre salaire :</label>
+        <input type="text" id="salary" name="salary"  placeholder="Entrez votre salaire(En FCFA)" required><br><br>
+        
+        <label for="months">Durée du prêt (en mois) :</label>
+        <input type="text" id="months" name="months"  placeholder="Entrez la duree du pret en annee" required><br><br>
+        
+        <input type="submit" value="Calculer">
+   </div>     
+    </form>
+</body>
+</html>

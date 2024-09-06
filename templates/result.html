@@ -1,0 +1,33 @@
+<!--# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 19 08:18:19 2024
+
+@author: OMD
+"""
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Résultat de la Simulation</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="..static/js/scripts.js"></script>
+</head>
+<body>
+   <div id="logo-container"></div>
+   <div class="centered-box">
+        <h1>Résultat de la Simulation</h1>
+        {% if abordable_duree %}
+            {% if abordable %}
+            <p>Votre paiement mensuel est de : {{ monthly_payment }} FCFA</p>
+            <p>Votre pret est abordable !</p>
+            {% else %}   
+            <p>Il est impossible que vous ayez ce pret avec votre salaire actuel. Essayer de reduire le montant du pret !</p>
+            {% endif %}
+        {% else %}
+            <p> Vous ne pouvez pas atteindre cette duree de pret essayer de reduire la duree en mois ! </p>
+        {% endif %}        
+        <a href="/">Faire une nouvelle simulation</a>
+   </div> 
+</body>
+</html>
